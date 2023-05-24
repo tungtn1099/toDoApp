@@ -23,19 +23,6 @@ function writeData(data) {
     
 }
 
-// var data = [
-//     {
-//         "id": 1,
-//         "task": "code",
-//         "status": "doing",
-//     },
-//     {
-//         "id": 2,
-//         "task": "eat",
-//         "status": "done",
-//     }
-// ];
-
 app.post('/tasks', (req, res) => {
     const tasks = readData();
     const newTask = {
@@ -49,11 +36,29 @@ app.post('/tasks', (req, res) => {
 })
 
 app.post('/tasks/commit', (req, res) => {
-    res.send("unimplemented");
+    const tasks = readData();
+    const id = req.query.taskid;
+    const status = req.query.status;
+    const commitTask = {
+        "id" : id,
+        "task" : tasks[id-1].task,
+        "status": status
+    }
+    tasks[id-1] = commitTask;
+    writeData(tasks);
+    res.send(tasks);
 })
 
 app.get('/tasks', (req, res) => {
-    res.send("unimplemented");
+    const tasks = readData();
+    const status = req.query.status;
+    if(status == null){
+        res.send(tasks);
+    }
+    else {
+        var filtered = tasks.filter(s => s.status == status);
+        res.send(filtered);
+    }
 })
 
 app.get('/tasks/check', (req, res) => {
