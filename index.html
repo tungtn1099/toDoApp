@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+    <head>
+
+    </head>
+    <body>
+        Task create <br/>
+        <form method="post" action="tasks">
+            <input type="text" name="taskCreate"/><br/>
+            <button type="submit">Create</button>
+        </form><br/>
+
+        Task commit<br/>
+        <form method="post" action="tasks/commit">
+            <input type="text" name="taskid"/><br/>
+            <input type="status" name="status"/><br/>
+            <button type="submit">Commit</button>
+        </form><br/>
+
+        View tasks<br/>
+        <form method="get" action="tasks">
+            <input type="text" name="status"/><br/>
+            <button type="submit">View</button>
+        </form>
+        
+        Check a task<br/>
+        <form method="get" action="tasks/check">
+            <input type="text" name="taskid"/><br/>
+            <button type="submit">Check</button>
+        </form><br/>
+    </body>
+</html>

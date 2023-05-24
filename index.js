@@ -1,70 +1,61 @@
-const express = require('express')
+const express = require('express');
+const utils = require('./utils');
+const constant = require('./constant');
+const path = require('path');
+const bodyParser = require('body-parser');
+
 const app = express();
-const fs = require('fs');
-const dataSource = 'data.json';
 app.use(express.json());
+app.use(bodyParser.urlencoded({extended: true}));
 
-function readData() {
-    try {
-        const buffer = fs.readFileSync(dataSource);
-        return JSON.parse(buffer);
-    } catch(err) {
-        console.log("Error reading data", err);
-        return [];
-    }
-}
-
-function writeData(data) {
-    const jsonString = JSON.stringify(data);
-    fs.writeFile(dataSource, jsonString, err => {
-        if(err) console.log('Error writing file', err);
-        else console.log("Wrote");
-    })
-    
-}
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, './index.html'));
+})
 
 app.post('/tasks', (req, res) => {
-    const tasks = readData();
+    const tasks = utils.readData();
     const newTask = {
         "id" : tasks.length + 1,
-        "task": req.body.task,
+        "task": req.body.taskCreate,
         "status": "doing"
     }
     tasks.push(newTask);
-    writeData(tasks);
+    utils.writeData(tasks);
     res.send(newTask);
 })
 
 app.post('/tasks/commit', (req, res) => {
-    const tasks = readData();
-    const id = req.query.taskid;
-    const status = req.query.status;
+    const tasks = utils.readData();
+    const id = req.body.taskid;
+    const status = req.body.status;
     const commitTask = {
         "id" : id,
         "task" : tasks[id-1].task,
         "status": status
     }
     tasks[id-1] = commitTask;
-    writeData(tasks);
-    res.send(tasks);
+    utils.writeData(tasks);
+    res.send(commitTask);
 })
 
 app.get('/tasks', (req, res) => {
-    const tasks = readData();
-    const status = req.query.status;
+    const tasks = utils.readData();
+    const status = req.body.status;
     if(status == null){
         res.send(tasks);
     }
     else {
-        var filtered = tasks.filter(s => s.status == status);
+        const filtered = tasks.filter(s => s.status === status);
         res.send(filtered);
     }
 })
 
 app.get('/tasks/check', (req, res) => {
-    const id = req.query.taskid;
-    const tasks = readData();
+    const id = req.body.taskid;
+    const tasks = utils.readData();
     res.send(tasks[id-1].status)
 })
 
-app.listen(9999);
+app.listen(constant.PORT, () => {
+    console.log(`starting server at http://localhost:${constant.PORT}`)
+});
